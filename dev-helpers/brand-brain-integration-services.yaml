@@ -20,15 +20,15 @@ tags:
     #externalDocs:
     #  description: Find out more
     #  url: http://swagger.io
-  - name: image
-    description: Generation of image content
+  #- name: image
+  #  description: Generation of image content
     #externalDocs:
     #  description: Find out more about our store
     #  url: http://swagger.io
   - name: work
     description: Work management operations
   - name: context
-    description: Retreive context data for a given input text
+    description: Retrieve context data for a given input text
 security:
   - ApiKeyAuth: []
 paths:
@@ -66,7 +66,7 @@ paths:
       operationId: getTaskList
       responses:
         '200':
-          description: Sucessful operation
+          description: Successful operation
           content:
             application/json:
               schema:
@@ -94,7 +94,7 @@ paths:
           description: Invalid input
         '401':
           $ref: "#/components/responses/UnauthorizedError"
-    post:
+    put:
       tags:
         - work
       summary: Update a task
