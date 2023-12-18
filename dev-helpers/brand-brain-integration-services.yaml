@@ -1,0 +1,211 @@
+openapi: 3.0.3
+info:
+  title: Brand Brain Integrtion Service - OpenAPI 3.0
+  description: |-
+    This it the Brand Brain Integration Service based on the OpenAPI 3.0 specification.
+  contact:
+    email: martin.noble@uk.ibm.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+#externalDocs:
+#  description: Find out more about Swagger
+#  url: http://swagger.io
+#servers:
+#  - url: https://petstore3.swagger.io/api/v3
+tags:
+  - name: text
+    description: Generation of text content
+    #externalDocs:
+    #  description: Find out more
+    #  url: http://swagger.io
+  - name: image
+    description: Generation of image content
+    #externalDocs:
+    #  description: Find out more about our store
+    #  url: http://swagger.io
+  - name: work
+    description: Work management operations
+  - name: context
+    description: Retreive context data for a given input text
+security:
+  - ApiKeyAuth: []
+paths:
+  /text/generate:
+    post:
+      tags:
+        - text
+      summary: Generate text content
+      description: Generate text content from a given prompt
+      operationId: generateText
+      requestBody:
+        description: Generate text
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TextRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TextResponse'
+        '405':
+          description: Invalid input
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+  /work/taskList:
+    get:
+      tags:
+        - work
+      summary: Get a list of tasks
+      description: Returns a list of tasks from the work management sytem
+      operationId: getTaskList
+      responses:
+        '200':
+          description: Sucessful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskList'
+        '405':
+          description: Invalid input
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+  /work/task/{id}:
+    get:
+      tags:
+        - work
+      summary: Get details of a task
+      description: Get full details of a task from the work management system
+      operationId: getTask
+      parameters:
+        - name: id
+          in: path
+          description: 'The id of the task to operate on'
+          required: true
+          schema:
+            type: string
+      responses:
+        '405':
+          description: Invalid input
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+    post:
+      tags:
+        - work
+      summary: Update a task
+      description: Add an update to a task in the work management system
+      operationId: updateTask
+      parameters:
+        - name: id
+          in: path
+          description: 'The id of the task to operate on'
+          required: true
+          schema:
+            type: string
+      responses:
+        '405':
+          description: Invalid input
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+      requestBody:
+        description: Generate text
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DetailedTask'
+        required: true
+  /context:
+    post:
+      tags:
+        - context
+      summary: Retrieve context data
+      description: Retrieve context data given a user selection
+      operationId: retrieveContext
+      requestBody:
+        description: Retrieve context
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContextRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TextResponse'
+        '405':
+          description: Invalid input
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+
+components:
+  schemas:
+    TextRequest:
+      required:
+        - input
+      type: object
+      properties:
+        input:
+          type: string
+          example: Generate a 5 sentence marketing message for...
+    TextResponse:
+      type: object
+      properties:
+        result:
+          type: string
+          example: \nThank you!\nIn order format this properly as markdown please use...
+    ContextRequest:
+      required:
+        - input
+      type: object
+      properties:
+        input:
+          type: string
+          example: "Audience: Business"
+
+    TaskList:
+      type: object
+      properties:
+        tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/BasicTask'
+    BasicTask:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1234
+        title:
+          type: string
+          example: This is an example task
+    DetailedTask:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1234
+        title:
+          type: string
+          example: This is an example task
+        description:
+          type: string
+          example: This is the full description of this task
+        dueDate:
+          type: string
+
+  responses:
+    UnauthorizedError:
+      description: API key is missing or invalid
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      name: X-API-KEY
+      in: header
